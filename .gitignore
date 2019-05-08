@@ -1,0 +1,11 @@
+/.idea
+/.vscode
+/target
+/public/js
+/public/lib
+/node_modules
+/config.js
+/package-lock.json
+/PID
+/SERVER.LOG
+/*.xlsx

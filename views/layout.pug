@@ -1,0 +1,34 @@
+extends meta
+
+block body
+    div#top-bar.ui.fixed.blue.inverted.menu
+        div.ui.container
+            a.header.item(href=`${webURL}/`)
+                = title
+            a.item(href=`${webURL}/records/`) 审核
+            div.ui.simple.dropdown.item
+                a(href='#') 人员信息
+                i.dropdown.icon
+                div.menu
+                    a.item(href=`${webURL}/classes/`) 班级管理
+                    a.item(href=`${webURL}/students/`) 学生管理
+                    a.item(href=`${webURL}/teachers/`) 教师管理
+            div.ui.simple.dropdown.item
+                a(href='#') 竞赛信息
+                i.dropdown.icon
+                div.menu
+                    a.item(href=`${webURL}/competitions/`) 竞赛资料
+                    a.item(href=`${webURL}/rating-info/`) 评级信息
+            a.item(href=`${webURL}/users/`) 用户管理
+            div.ui.right.simple.dropdown.item
+                a(href=`${webURL}/profile/`) {{profile.name}}
+                i.dropdown.icon
+                div.menu
+                    a.item(@click='logout') 退出登录
+
+    script(src=`${staticURL}/js/views/layout.js`)
+    div(style='padding-top: 72px; padding-bottom: 72px')
+        block content
+    div(style='text-align: center')
+        = `${title} @ SDUST`
+

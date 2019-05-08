@@ -1,0 +1,37 @@
+extends layout
+
+block title
+    = `教师管理 - ${title}`
+block import
+
+block content
+    style.
+        .dis-selectable {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    div#main.ui.container
+        div.ui.grid
+            div.two.wide.column
+            div.twelve.wide.column
+                div.ui.menu
+                    div.item
+                        div.ui.transparent.input
+                            input(type='text', placeholder='输入姓名或工号查询', style='max-width: 140px', v-model='filter.search', @keydown.enter='requestForList')
+                    a.icon.item(href='javascript: void(0)', @click='requestForList')
+                        i.search.icon
+                    a.right.icon.item(href='javascript: void(0)', @click='openFileUpload')
+                        i.upload.icon
+                input#file-upload(type='file', style='visibility: hidden', @change='fileUpload')
+                div.ui.segment
+                    table.ui.very.basic.table
+                        thead
+                            tr
+                                th 工号
+                                th 姓名
+                        tbody
+                            tr(v-for='item in data')
+                                td {{item.card_id}}
+                                td {{item.name}}
+            div.two.wide.column

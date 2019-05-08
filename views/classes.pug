@@ -1,0 +1,53 @@
+extends layout
+
+block title
+    = `班级管理 - ${title}`
+block import
+
+block content
+    style.
+        .dis-selectable {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    div#main.ui.container
+        div.ui.grid
+            div.two.wide.column
+            div.twelve.wide.column
+                div.ui.menu
+                    div.ui.pointing.dropdown.dropdown-menu.item
+                        span.text {{filter.college || '未选择学院'}}
+                        i.dropdown.icon
+                        div.menu
+                            div.item(@click='selectCollege(null)') (不选择学院)
+                            div.item(v-for='college in ui.colleges', @click='selectCollege(college)') {{college}}
+                    div.ui.pointing.dropdown.dropdown-menu.item
+                        span.text {{filter.subject || '未选择专业'}}
+                        i.dropdown.icon
+                        div.menu
+                            div.item(@click='selectSubject(null)') (不选择专业)
+                            div.item(v-for='subject in ui.subjects', @click='selectSubject(subject)') {{subject}}
+                    div.item
+                        div.ui.transparent.input
+                            input(type='number', placeholder='年级', style='max-width: 70px', min='1995', v-model='filter.grade', @keydown.enter='requestForList')
+                    a.icon.item(href='javascript: void(0)', @click='requestForList')
+                        i.search.icon
+                    a.right.icon.item(href='javascript: void(0)', @click='openFileUpload')
+                        i.upload.icon
+                input#file-upload(type='file', style='visibility: hidden', @change='fileUpload')
+                div.ui.segment
+                    table.ui.very.basic.table
+                        thead
+                            tr
+                                th 学院
+                                th 年级
+                                th 专业
+                                th 班级
+                        tbody
+                            tr(v-for='item in data')
+                                td {{item.college}}
+                                td {{item.grade}}
+                                td {{item.subject}}
+                                td {{item.number}}
+            div.two.wide.column

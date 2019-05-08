@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    title
+      block title
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css')
+    //link(rel='stylesheet', href=`${staticURL}/lib/semantic-ui-calendar/dist/calendar.min.css`)
+    script(src='https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/vue@2.6.8/dist/vue.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js')
+    //script(src=`${staticURL}/lib/semantic-ui-calendar/dist/calendar.min.js`)
+    script(src=`https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js`)
+    script(src=`https://cdn.jsdelivr.net/npm/js-xlsx@0.8.22/dist/xlsx.core.min.js`)
+    script(src=`${staticURL}/js/core/sdk.js`)
+    script(src=`${staticURL}/js/core/excel.js`)
+    script
+      = `window['webURL'] = '${webURL}';`
+      = `window['serverURL'] = '${serverURL}';`
+      = `window['staticURL'] = '${staticURL}';`
+      = `window['client'] = new Client({serverURL, tokenPrefix: '${prefix}'});`
+      = `window['prefix'] = '${prefix}';`
+      = `window['vms'] = {};`
+      = `window['setTitle'] = function(t) {document.title = t ? t + ' - ${title}' : '${title}'}`
+    block import
+  body
+    block body
+  script(src=`${staticURL}/js/views/${selfLocation}.js`)
