@@ -1,0 +1,77 @@
+extends layout
+
+block title
+    = `竞赛资料 - ${title}`
+block import
+
+block content
+    style.
+        .dis-selectable {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    div#main.ui.container
+        div.ui.grid
+            div.two.wide.column
+            div.twelve.wide.column(v-if='ui.mode === "list"')
+                div.ui.menu
+                    div.item
+                        div.ui.transparent.input
+                            input(type='text', placeholder='输入竞赛名称查询', style='max-width: 140px', v-model='filter.search', @keydown.enter='requestForList')
+                    a.icon.item(href='javascript: void(0)', @click='requestForList')
+                        i.search.icon
+                    a.right.icon.item(href='javascript: void(0)', @click='create')
+                        i.plus.icon
+                div.ui.segment
+                    table.ui.very.basic.table
+                        thead
+                            tr
+                                th 竞赛名称
+                                th 竞赛类别
+                                th 主办方
+                                th 举办时间
+                                th 评级信息
+                                th 评级分类
+                                th 评级等级
+                        tbody
+                            tr(v-for='(item, index) in data')
+                                td
+                                    a(href='javascript: void(0)', @click='edit(index)') {{item.name}}
+                                td {{item.category}}
+                                td {{item.organizer}}
+                                td {{item.hold_time}}
+                                td {{item.rating_info}}
+                                td {{item.rating_info_category}}
+                                td {{item.rating_info_level_title}}
+            div.twelve.wide.column(v-show='ui.mode === "edit" || ui.mode === "create"')
+                div.ui.menu
+                    a.icon.item(href='javascript: void(0)', @click='backToList')
+                        i.left.angle.icon
+                div.ui.segment
+                    div.ui.grid
+                        div.two.wide.column
+                        div.twelve.wide.column
+                            div.ui.form
+                                div.ui.field.required
+                                    label 竞赛名称
+                                    input(type='text', v-model='editor.name')
+                                div.ui.field.required
+                                    label 竞赛类别
+                                    input(type='text', v-model='editor.category')
+                                div.ui.field.required
+                                    label 主办方
+                                    input(type='text', v-model='editor.organizer')
+                                div.ui.field.required
+                                    label 举办时间
+                                    input(type='text', placeholder='YYYY-MM-DD', v-model='editor.hold_time')
+                                div.ui.field
+                                    label 评级信息
+                                    div.ui.pointing.dropdown.dropdown-menu.basic.fluid.button
+                                        span.text {{editor.rating_info ? `${editor.rating_info} (${editor.rating_info_level})` : '未选择'}}
+                                        i.dropdown.icon
+                                        div.menu
+                                            div.item(v-for='info in ui.ratingInfo', @click='selectRatingInfo(info)') {{info.competition_name}} ({{info.level_title}})
+                                button.ui.fluid.green.button(@click='submit') 提交
+                        div.two.wide.column
+            div.two.wide.column

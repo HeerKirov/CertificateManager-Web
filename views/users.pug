@@ -1,0 +1,95 @@
+extends layout
+
+block title
+    = `用户管理 - ${title}`
+block import
+
+block content
+    div#main.ui.container
+        div.ui.grid
+            div.two.wide.column
+            div.twelve.wide.column
+                div.ui.menu
+                    div.ui.pointing.dropdown.dropdown-menu.item
+                        span.text {{userTypeEnums[filter.userType] || '全部账户'}}
+                        i.dropdown.icon
+                        div.menu
+                            div.item(@click='selectUserType(null)') 全部账户
+                            div.item(@click='selectUserType("ADMIN")') 管理员
+                            div.item(@click='selectUserType("STUDENT")') 学生
+                    div.item
+                        div.ui.transparent.input
+                            input(type='text', placeholder='输入用户名或姓名查询', style='max-width: 140px', v-model='filter.search', @keydown.enter='requestForList')
+                    a.icon.item(href='javascript: void(0)', @click='requestForList')
+                        i.search.icon
+                    a.right.icon.item(href='javascript: void(0)', @click='create')
+                        i.plus.icon
+                div.ui.segment
+                    table.ui.very.basic.table
+                        thead
+                            tr
+                                th 账户类型
+                                th 用户名
+                                th 用户姓名
+                                th 最后登录
+                                th 注册时间
+                        tbody
+                            tr(v-for='(item, index) in data')
+                                td {{userTypeEnums[item.userType]}}
+                                td
+                                    a(href='javascript: void(0)', @click='edit(index)') {{item.username}}
+                                td {{item.name}}
+                                td {{fmtStdDate(item.last_login)}}
+                                td {{fmtStdDate(item.date_joined)}}
+            div.two.wide.column
+        div#edit-modal.ui.modal
+            div.header 修改信息
+            div.content
+                div.ui.form
+                    div.ui.two.columns.fields
+                        div.ui.field
+                            label 用户名
+                            div {{editor.username}}
+                        div.ui.field
+                            label 用户类型
+                            div {{userTypeEnums[editor.userType]}}
+                    div.ui.field
+                        label 姓名
+                        input(type='text', v-model='editor.name')
+                    div.ui.two.columns.fields
+                        div.ui.field
+                            label 修改密码
+                            input(type='password', v-model='editor.password', placeholder='输入新密码')
+                        div.ui.field
+                            label 确认密码
+                            input(type='password', v-model='editor.check', placeholder='再次输入新密码')
+                    button.ui.fluid.green.button(@click='submitEdit') 提交
+        div#create-modal.ui.modal
+            div.header 新建
+            div.content
+                div.ui.form
+                    div.ui.three.columns.fields
+                        div.ui.field.required
+                            label 用户类型
+                            div.ui.pointing.dropdown.dropdown-menu.basic.fluid.button
+                                span.text {{userTypeEnums[creator.userType]}}
+                                i.dropdown.icon
+                                div.menu
+                                    div.item(@click='selectCreatorUserType("ADMIN")') 管理员
+                                    div.item(@click='selectCreatorUserType("STUDENT")') 学生
+                        div.ui.field.required
+                            label 用户名
+                            input(type='text', v-model='creator.username', @keydown.enter='submitCreate', :placeholder='creator.userType === "ADMIN" ? "请自定义一个管理员账户名" : "请填写学生的学号作为用户名"')
+                        div.ui.field
+                            label 用户姓名
+                            input(type='text', v-model='creator.name', :placeholder='creator.userType === "ADMIN" ? "不填写时，默认以用户名为用户姓名" : "不填写时，默认以学生姓名为用户姓名"')
+                    div.ui.fields
+                        div.ui.seven.wide.field
+                            label 密码
+                            input(type='password', placeholder='不填写时，以用户名为默认密码', v-model='creator.password')
+                        div.ui.seven.wide.field
+                            label 确认密码
+                            input(type='password', placeholder='使用自定义密码时，再次输入以确认', v-model='creator.check')
+                        div.ui.two.wide.field
+                            label &nbsp;
+                            button.ui.fluid.green.button(@click='submitCreate') 添加

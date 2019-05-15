@@ -1,0 +1,143 @@
+extends layout
+
+block title
+    = `记录与审核 - ${title}`
+block import
+
+block content
+    div#main.ui.container
+        div.ui.grid
+            div.two.wide.column
+            div.twelve.wide.column(v-show='mode === "list"')
+                div.ui.menu
+                    div.ui.pointing.dropdown.dropdown-menu.item
+                        span.text {{reviewStatusEnums[filter.reviewStatus] || '全部记录'}}
+                        i.dropdown.icon
+                        div.menu
+                            div.item(@click='selectRecordType(null)') 全部记录
+                            div.item(v-for='(value, key) in reviewStatusEnums' @click='selectRecordType(key)') {{value}}
+                    div.item
+                        div.ui.transparent.input
+                            input(type='text', placeholder='输入竞赛关键字查询', style='max-width: 140px', v-model='filter.search', @keydown.enter='requestForList')
+                    a.icon.item(href='javascript: void(0)', @click='requestForList')
+                        i.search.icon
+                div.ui.segment
+                    table.ui.very.basic.table
+                        thead
+                            tr
+                                th 竞赛
+                                th 获奖
+                                th 参加成员
+                                th 指导教师
+                                th 更新时间
+                                th 审核
+                        tbody
+                            tr(v-for='(item, index) in data')
+                                td
+                                    a(href='javascript: void(0)', @click='detail(index)') {{item.competitionName}}
+                                td {{item.awardLevel}}
+                                td {{fmtStudents(item.students)}}
+                                td {{item.teacher.name}}
+                                td {{fmtStdDate(item.updateTime)}}
+                                td(:style='{color: reviewStatusColor[item.reviewStatus]}', v-if='item.reviewStatus !== "WAITING"') {{reviewStatusEnums[item.reviewStatus]}}
+                                td(v-else)
+                                    button.ui.tiny.button(@click='review(index)') 审核
+                    div.ui.grid(v-if='pagination.maxPageIndex > 1 || pagination.pageIndex > pagination.maxPageIndex')
+                        div.right.aligned.column
+                            div.ui.small.basic.buttons
+                                button.ui.icon.button(@click='pageTo("first")')
+                                    i.angle.double.left.icon
+                                button.ui.icon.button(@click='pageTo("prev")')
+                                    i.angle.left.icon
+                                button.ui.icon.button(v-for='i in pagination.navigator', @click='pageTo(i)', :class='{active: i === pagination.pageIndex}') {{i}}
+                                button.ui.icon.button(@click='pageTo("next")')
+                                    i.angle.right.icon
+                                button.ui.icon.button(@click='pageTo("last")')
+                                    i.angle.double.right.icon
+            div.twelve.wide.column(v-if='mode === "detail"')
+                div.ui.menu
+                    a.ui.icon.item(@click='backToList')
+                        i.left.angle.icon
+                    div.item 详情
+                    div.right.item(v-if='detailData.reviewStatus !== "WAITING"') {{reviewStatusEnums[detailData.reviewStatus]}}
+                    a.ui.right.icon.item(v-else, @click='review(detailData)')
+                        i.pencil.icon(style='margin-right: 5px')
+                        = '审核'
+                div.ui.segment
+                    div.ui.form
+                        div.ui.field
+                            label 竞赛名称
+                            div {{detailData.competitionName}}
+                        div.ui.fields
+                            div.ui.six.wide.field
+                                label 竞赛类别
+                                div {{detailData.competitionCategory}}
+                            div.ui.six.wide.field
+                                label 主办方
+                                div {{detailData.organizer}}
+                            div.ui.four.wide.field
+                                label 举办时间
+                                div {{detailData.holdTime}}
+                        div.ui.fields
+                            div.ui.six.wide.field
+                                label 作品名称
+                                div {{detailData.worksName}}
+                            div.ui.ten.wide.field
+                                label 获奖等级
+                                div {{detailData.awardLevel}}
+                        div.ui.divider
+                        div.ui.fields
+                            div.ui.ten.wide.field
+                                label 参加成员
+                                div(v-for='student in detailData.students') {{fmtStudentInfo(student)}}
+                            div.ui.six.wide.field
+                                label 指导教师
+                                div {{fmtTeacherInfo(detailData.teacher)}}
+                        div.ui.divider
+                        div.ui.three.columns.fields
+                            div.ui.field(v-for='image in detailData.images')
+                                label {{imageCategoryName[image.category]}}
+                                a(:href='image.file', target='_blank')
+                                    img(style='max-width: 100%', :src='image.file')
+            div.two.wide.column
+        div#review-modal.ui.tiny.modal
+            div.header 审核
+            div.content
+                div.ui.form
+                    div.ui.field
+                        div.ui.fluid.buttons
+                            div.ui.green.button(:class='{basic: reviewData.reviewStatus !== "PASSED"}', @click='reviewData.reviewStatus = "PASSED"') 给予通过
+                            div.ui.red.button(:class='{basic: reviewData.reviewStatus !== "NOT_PASS"}', @click='reviewData.reviewStatus = "NOT_PASS"') 拒绝通过
+                    div.ui.field(v-show='reviewData.reviewStatus === "PASSED"')
+                        label 选择竞赛记录配对
+                        select#competition-picker.ui.dropdown.search.dropdown-select(v-model='reviewData.competitionIndex')
+                            option(value=' ') (以基础信息为准新建)
+                            option(v-for='(competition, index) in competitions', :value='`_${index}`') {{competition.name}}
+                    div.ui.two.columns.fields(v-show='reviewData.reviewStatus === "PASSED"')
+                        div.ui.field
+                            label 竞赛名称
+                            div {{reviewData.competition.name}}
+                        div.ui.field
+                            label 竞赛类别
+                            div {{reviewData.competition.category}}
+                    div.ui.two.columns.fields(v-show='reviewData.reviewStatus === "PASSED"')
+                        div.ui.field
+                            label 主办方
+                            div {{reviewData.competition.organizer}}
+                        div.ui.field
+                            label 举办时间
+                            div {{reviewData.competition.holdTime}}
+                    div.ui.field(v-show='reviewData.reviewStatus === "PASSED" && reviewData.competitionIndex === " "')
+                        label 评级选择
+                        select#rating-info-picker.ui.dropdown.search.dropdown-select(v-model='reviewData.ratingInfoIndex')
+                            option(v-for='(info, index) in ratingInfo', :value='`_${index}`') {{info.competition_name}}
+                    div.ui.two.columns.fields(v-show='reviewData.reviewStatus === "PASSED" && (reviewData.competitionIndex !== " " || reviewData.ratingInfoIndex != null)')
+                        div.ui.field
+                            label 评级分类
+                            div {{reviewData.ratingInfo.category}}
+                        div.ui.field
+                            label 评级等级
+                            div {{reviewData.ratingInfo.level}}
+                    button.ui.fluid.icon.button(style='margin-top: 20px', @click='submitReview')
+                        i.check.icon
+                        = '提交审核结果'

@@ -117,7 +117,7 @@ class Client {
             info: this.endpoint('/auth/info', ['get', 'put', 'patch']),
         }
         this['admin'] = {
-            users: this.endpoint('/admin/users', ['list', 'create', 'retrieve', 'update']),
+            users: this.endpoint('/admin/users', ['list', 'create', 'retrieve', 'update', 'partialUpdate']),
             colleges: this.endpoint('/admin/colleges'),
             subjects: this.endpoint('/admin/subjects'),
             classes: this.endpoint('/admin/classes'),
