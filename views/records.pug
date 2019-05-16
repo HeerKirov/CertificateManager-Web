@@ -21,6 +21,8 @@ block content
                             input(type='text', placeholder='输入竞赛关键字查询', style='max-width: 140px', v-model='filter.search', @keydown.enter='requestForList')
                     a.icon.item(href='javascript: void(0)', @click='requestForList')
                         i.search.icon
+                    a.right.ui.icon.item(@click='download')
+                        i.download.icon
                 div.ui.segment
                     table.ui.very.basic.table
                         thead

@@ -72,6 +72,10 @@ class Client {
                 this.instance.get(this.getURL(url), {params: callback ? params : null, headers: this.getHeaders()})
                     .then((response) => Client.callbackSuccess(callback || params, response))
                     .catch((error) => this.callbackFailed(callback || params, error)),
+            download: (url: string) => (params, callback) =>
+                this.instance.get(this.getURL(url), {params: callback ? params : null, headers: this.getHeaders(), responseType: 'arraybuffer'})
+                    .then((response) => Client.callbackSuccess(callback || params, response))
+                    .catch((error) => this.callbackFailed(callback || params, error)),
             post: (url: string) => (content, params, callback) =>
                 this.instance.post(this.getURL(url), content, {params: callback ? params : null, headers: this.getHeaders()})
                     .then((response) => Client.callbackSuccess(callback || params, response))
@@ -125,7 +129,9 @@ class Client {
             teachers: this.endpoint('/admin/teachers'),
             ratingInfo: this.endpoint('/admin/rating-info'),
             competitions: this.endpoint('/admin/competitions'),
-            records: this.endpoint('/admin/records', ['list', 'retrieve', 'update']),
+            records: this.endpoint('/admin/records', ['list', 'retrieve', 'update'], {
+                download: this.endpoint('/admin/records/download', ['download'])
+            }),
             collegeBatch: this.endpoint('/admin/college-batch', ['post']),
             subjectBatch: this.endpoint('/admin/subject-batch', ['post']),
             classBatch: this.endpoint('/admin/class-batch', ['post']),

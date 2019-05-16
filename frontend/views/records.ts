@@ -294,6 +294,27 @@
                     alert('请首先给出确定的审核结果。')
                 }
             },
+            download() {
+                client.admin.records.download.download({
+                    review__status: this.filter.reviewStatus || null,
+                    search: this.filter.search || null,
+                    limit: this.pagination.pageLimit,
+                    offset: (this.pagination.pageIndex - 1) * this.pagination.pageLimit
+                }, (ok, s, d) => {
+                    const blob = new Blob([d], {type: 'application/zip'})
+                    let url = URL.createObjectURL(blob)
+                    window.location.href = url
+                    // const fileName = '打包.zip'
+                    // const link = document.createElement('a')
+                    // link.download = fileName
+                    // link.style.display = 'none'
+                    // link.href = URL.createObjectURL(blob)
+                    // document.body.appendChild(link)
+                    // link.click()
+                    // URL.revokeObjectURL(link.href)
+                    // document.body.removeChild(link)
+                })
+            },
 
             fmtStdDate(date: Date): string {
                 if(!date) return ''
